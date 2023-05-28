@@ -8,3 +8,10 @@ export function getAppointmentsForDay(state, day) {
   }
   return apptsArray;
 }
+
+export function getInterview(state, interview) {
+  if (interview && interview.interviewer) {
+    return {...interview, interviewer: state.interviewers[interview.interviewer]};
+  }
+  return null;
+};
