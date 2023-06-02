@@ -7,6 +7,7 @@ import Empty from "./Empty";
 import Form from "./Form";
 import Status from "./Status";
 import Confirm from "./Confirm";
+import Error from "./Error";
 import useVisualMode from "hooks/useVisualMode";
 
 export default function Appointment(props) {
@@ -17,6 +18,8 @@ export default function Appointment(props) {
   const DELETING = "DELETING";
   const CONFIRM = "CONFIRM";
   const EDIT = "EDIT";
+  const ERROR_SAVE = "ERROR_SAVE";
+  const ERROR_DELETE = "ERROR_DELETE";
 
   const { mode, transition, back } = useVisualMode(
     props.interview ? SHOW : EMPTY
@@ -28,18 +31,18 @@ export default function Appointment(props) {
       interviewer: interviewerId
     };
     transition(SAVING);
-    props.bookInterview(props.id, interview)
-      .then(() => {
-        transition(SHOW);
-      });
+    props
+      .bookInterview(props.id, interview)
+      .then(() => transition(SHOW))
+      .catch(error => transition(ERROR_SAVE, true));
   }
 
-  function deleteAppointment() {
-    transition(DELETING);
-    props.cancelInterview(props.id)
-      .then(() => {
-        transition(EMPTY);
-      });
+  function destroy() {
+    transition(DELETING, true);
+    props
+      .cancelInterview(props.id)
+      .then(() => transition(EMPTY))
+      .catch(error => transition(ERROR_DELETE, true));
   }
 
   return (
@@ -67,7 +70,7 @@ export default function Appointment(props) {
         <Confirm
           message='Are you sure you would like to delete?'
           onCancel={back}
-          onConfirm={deleteAppointment}
+          onConfirm={destroy}
         />
       )}
       {mode === EDIT && (
@@ -77,6 +80,18 @@ export default function Appointment(props) {
           interviewers={props.interviewers}
           onCancel={back}
           onSave={save}
+        />
+      )}
+      {mode === ERROR_SAVE && (
+        <Error
+          message="Could not save appoinment."
+          onClose={back}
+        />
+      )}
+      {mode === ERROR_DELETE && (
+        <Error
+          message="Could not cancel appoinment."
+          onClose={back}
         />
       )}
     </article>
