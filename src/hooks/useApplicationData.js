@@ -21,6 +21,15 @@ export default function useApplicationData() {
     });  
   }, []);
 
+  function getDaysWithUpdatedSpots(appointmentId, appointments) {
+    let days = [...state.days];
+    let day = state.days.find(day => day.appointments.includes(appointmentId));
+    day.spots = day.appointments
+      .filter(appointmentId => appointments[appointmentId].interview === null)
+      .length;
+    return days;
+  }
+
   function bookInterview(id, interview) {
     const appointment = {
       ...state.appointments[id],
@@ -30,17 +39,12 @@ export default function useApplicationData() {
       ...state.appointments,
       [id]: appointment
     };
-    const dayIndex = state.days.findIndex(day => day.appointments.includes(id));
-    let days = [...state.days]
-    if (state.appointments[id].interview === null) {
-      days[dayIndex].spots = state.days[dayIndex].spots - 1;
-    }
-    
+ 
     return axios.put(`/api/appointments/${id}`, {interview: interview})
       .then(() => {
         setState({
           ...state,
-          days,
+          days: getDaysWithUpdatedSpots(id, appointments),
           appointments 
         });
       });
@@ -55,15 +59,12 @@ export default function useApplicationData() {
       ...state.appointments,
       [id]: appointment
     };
-    const dayIndex = state.days.findIndex(day => day.appointments.includes(id));
-    let days = [...state.days];
-    days[dayIndex].spots = state.days[dayIndex].spots + 1;
 
     return axios.delete(`/api/appointments/${id}`)
       .then(() => {
         setState({
           ...state,
-          days,
+          days: getDaysWithUpdatedSpots(id, appointments),
           appointments
         });
       });
