@@ -33,16 +33,16 @@ export default function Appointment(props) {
     transition(SAVING);
     props
       .bookInterview(props.id, interview)
-      .then(() => transition(SHOW))
-      .catch(error => transition(ERROR_SAVE, true));
+      .then(() => transition(SHOW)) // transition to SHOW when the promise returned resolved
+      .catch(error => transition(ERROR_SAVE, true)); // transition to ERROR_SAVE, repalce the current mode in history
   }
 
   function destroy() {
-    transition(DELETING, true);
+    transition(DELETING, true); // show the DELETING indicator, and replace the current mode in history
     props
       .cancelInterview(props.id)
-      .then(() => transition(EMPTY))
-      .catch(error => transition(ERROR_DELETE, true));
+      .then(() => transition(EMPTY)) // transition to EMPTY when the promise returned resolved
+      .catch(error => transition(ERROR_DELETE, true)); // transition to ERROR_DELETE, repalce the current mode in history
   }
 
   return (

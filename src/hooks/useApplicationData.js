@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+// Create a custom hook to load the initial data from the API
+// Also provide actions to update the sate
 export default function useApplicationData() {
   const [state, setState] = useState({
     day: "Monday",
@@ -10,7 +12,9 @@ export default function useApplicationData() {
   });
   
   const setDay = day => setState({ ...state, day });
-
+  
+  // Fetch data for days, appointments, interviewers
+  // Then update the state
   useEffect(() => {
     Promise.all([
       axios.get('/api/days'),
@@ -20,7 +24,8 @@ export default function useApplicationData() {
       setState(prev => ({...prev, days: all[0].data, appointments: all[1].data, interviewers: all[2].data }));
     });  
   }, []);
-
+  
+  // Create a function to update spots value for days
   function getDaysWithUpdatedSpots(appointmentId, appointments) {
     let days = [...state.days];
     let day = state.days.find(day => day.appointments.includes(appointmentId));
@@ -39,7 +44,8 @@ export default function useApplicationData() {
       ...state.appointments,
       [id]: appointment
     };
- 
+    
+    // To book an interview: makes an HTTP request, then updates the local state
     return axios.put(`/api/appointments/${id}`, {interview: interview})
       .then(() => {
         setState({
@@ -59,7 +65,8 @@ export default function useApplicationData() {
       ...state.appointments,
       [id]: appointment
     };
-
+    
+    // To cancel an interview: makes an HTTP request, then updates the local state
     return axios.delete(`/api/appointments/${id}`)
       .then(() => {
         setState({

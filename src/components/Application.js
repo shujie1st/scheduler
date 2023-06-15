@@ -15,7 +15,8 @@ export default function Application(props) {
   } = useApplicationData();
   
   const interviewers = getInterviewersForDay(state, state.day);
-
+  
+  // Transform interview data, then pass them as props to Appointment
   const appointmentItems = getAppointmentsForDay(state, state.day).map(
     appointment => {
       return (
